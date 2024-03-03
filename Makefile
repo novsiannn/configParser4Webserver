@@ -3,16 +3,16 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: nikitos <nikitos@student.42.fr>            +#+  +:+       +#+         #
+#    By: novsiann <novsiann@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/01 20:40:19 by nikitos           #+#    #+#              #
-#    Updated: 2024/03/01 20:40:36 by nikitos          ###   ########.fr        #
+#    Updated: 2024/03/02 13:16:07 by novsiann         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME		:= webserv
 
-SRCS		:= main.cpp src/ConfigParser.cpp
+SRCS		:= main.cpp src/ConfigParser.cpp src/ConfigFile.cpp
 
 OBJS		:= $(SRCS:.cpp=.o)
 
