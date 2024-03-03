@@ -6,7 +6,7 @@
 /*   By: novsiann <novsiann@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 20:11:42 by nikitos           #+#    #+#             */
-/*   Updated: 2024/03/02 16:20:34 by novsiann         ###   ########.fr       */
+/*   Updated: 2024/03/03 14:31:12 by novsiann         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 # define CONFIGPARSER_H
 
 #include <iostream>
+#include <algorithm>
+#include <string>
 
 class ConfigParser 
 {
@@ -21,6 +23,8 @@ class ConfigParser
 		ConfigParser();
 		~ConfigParser();
 		std::string readConfig( std::string path );
+		void		skipSpaces(std::string &content);
+		void		splitServers(std::string &content);
 
 		class ErrorParsing : public std::exception
 		{
@@ -40,5 +44,7 @@ class ConfigParser
 		private:
 			std::string _message;
 };
+
+void  deleteCommentedLines(std::string &content);
 
 #endif

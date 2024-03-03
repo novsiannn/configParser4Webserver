@@ -6,7 +6,7 @@
 /*   By: novsiann <novsiann@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 20:10:27 by nikitos           #+#    #+#             */
-/*   Updated: 2024/03/02 14:44:10 by novsiann         ###   ########.fr       */
+/*   Updated: 2024/03/03 11:33:51 by novsiann         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,12 +56,12 @@ int ConfigFile::isFileExistAndReadable(std::string const path, std::string const
 	return (-1);
 }
 
-std::string ConfigFile::readFile( std::string path )
+std::string ConfigFile::readFile( )
 {
 	
-	if (path.empty() || path.length() == 0)
+	if (_path.empty() || _path.length() == 0)
 		return (NULL);
-	std::ifstream config_file(path.c_str());
+	std::ifstream config_file(_path.c_str());
 	if (!config_file || !config_file.is_open())
 		return (NULL);
 	
