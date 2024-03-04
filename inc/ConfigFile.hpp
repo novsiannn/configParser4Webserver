@@ -3,21 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigFile.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: novsiann <novsiann@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nikitos <nikitos@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 20:11:42 by nikitos           #+#    #+#             */
-/*   Updated: 2024/03/03 11:40:59 by novsiann         ###   ########.fr       */
+/*   Updated: 2024/03/04 21:29:52 by nikitos          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CONFIGFILE_H
 # define CONFIGFILE_H
 
-#include <sys/stat.h>
-#include <iostream>
-#include <unistd.h>
-#include <fstream>
-#include <sstream>
+#include "AllHeaders.hpp"
 
 class ConfigFile 
 {
@@ -30,6 +26,7 @@ class ConfigFile
         int         checkFile(std::string const path, int mode);
         std::string readFile();
         std::string getPath() const;
+        int         checkCurlyBraces(std::string content);
     private:
         std::string _path;
 };

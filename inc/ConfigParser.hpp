@@ -3,19 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigParser.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: novsiann <novsiann@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nikitos <nikitos@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 20:11:42 by nikitos           #+#    #+#             */
-/*   Updated: 2024/03/03 14:31:12 by novsiann         ###   ########.fr       */
+/*   Updated: 2024/03/04 19:44:10 by nikitos          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CONFIGPARSER_H
 # define CONFIGPARSER_H
 
-#include <iostream>
-#include <algorithm>
-#include <string>
+#include "AllHeaders.hpp"
 
 class ConfigParser 
 {
@@ -24,7 +22,7 @@ class ConfigParser
 		~ConfigParser();
 		std::string readConfig( std::string path );
 		void		skipSpaces(std::string &content);
-		void		splitServers(std::string &content);
+		void		takeData(std::string line, int i);
 
 		class ErrorParsing : public std::exception
 		{
@@ -42,7 +40,7 @@ class ConfigParser
 				virtual ~ErrorParsing() throw() {}
 		};
 		private:
-			std::string _message;
+			std::multimap <std::string, int> _data;
 };
 
 void  deleteCommentedLines(std::string &content);

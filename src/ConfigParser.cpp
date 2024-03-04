@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigParser.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: novsiann <novsiann@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nikitos <nikitos@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 20:12:20 by nikitos           #+#    #+#             */
-/*   Updated: 2024/03/03 14:51:15 by novsiann         ###   ########.fr       */
+/*   Updated: 2024/03/04 21:32:16 by nikitos          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,31 +45,71 @@ void ConfigParser::skipSpaces(std::string &content)
   content = content.substr(0, i + 1);
 }
 
-void  ConfigParser::splitServers(std::string &content)
+void	ConfigParser::takeData(std::string line, int i)
 {
-  if(content.find("server", 0) == std::string::npos) 
-    throw ErrorParsing("Server did not find");
+	// std::cout << line;
+	this->_data.insert(std::make_pair(line, i));
+}
+
+int	ConfigFile::checkCurlyBraces( std::string content )
+{
+	int opening_brace = 0;
+	int closing_brace = 0;
+	int i = 0;
+
+	while(content[i] != 0)
+	{
+		if (content[i] == '{')
+			++opening_brace;
+		else if (content[i] == '}')
+			++closing_brace;
+		i++;
+	}
+	if(opening_brace == closing_brace)
+		return 1;
+	else
+		return 0;
 }
 
 std::string ConfigParser::readConfig( std::string path )
 {
 
-    ConfigFile  file(path);
-    std::string content;
+    ConfigFile		fileToCheck(path);
+	std::string		line;
+	std::string		content;
+	std::ifstream	file_toTakeData(path);
 
-    if (file.getTypePath(file.getPath()) != 1)
+    if (fileToCheck.getTypePath(fileToCheck.getPath()) != 1)
 		  throw ErrorParsing("File is invalid");
-    if (file.checkFile(file.getPath(), 4) == -1)
+    if (fileToCheck.checkFile(fileToCheck.getPath(), 4) == -1)
 		  throw ErrorParsing("File is not accessible");
-    content = file.readFile();
+	content = fileToCheck.readFile();
     if(content.empty())
-      throw ErrorParsing("File is empty");
-    deleteCommentedLines(content);
-    skipSpaces(content);
-    splitServers(content);
-  
-    // std::cout << content << std::endl;
-    
-    
+    	throw ErrorParsing("File is empty");
+	deleteCommentedLines(content);
+	if (!fileToCheck.checkCurlyBraces( content ))
+		throw ErrorParsing("Curly Braces are not closed");
+
+	// if (file_toTakeData.is_open()) 
+	// {
+	// 	int i = 0;
+    // 	while (getline(file_toTakeData, line, ';'))
+    //     {
+	// 		i++;
+	// 		this->takeData(line, i);
+	// 		// if (i > 3 )
+	// 		// 	break;
+	// 	}
+	// 	std::multimap <std::string, int>::iterator it;
+	// 	for(it = _data.begin(); it != _data.end(); it++)
+	// 	{
+	// 		std::cout << it->second <<" element in map -> " << it->first << std::endl;
+	// 	}
+    // }
+	
+
+	// file.takeData(file);
+
+    // skipSpaces(content);
     return path;
 }
