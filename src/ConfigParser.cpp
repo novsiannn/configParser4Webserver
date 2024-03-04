@@ -6,7 +6,7 @@
 /*   By: nikitos <nikitos@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 20:12:20 by nikitos           #+#    #+#             */
-/*   Updated: 2024/03/05 00:41:32 by nikitos          ###   ########.fr       */
+/*   Updated: 2024/03/05 00:47:53 by nikitos          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,7 @@ void	ConfigParser::takeData(std::string line, int i)
 	{
 		while (isalnum(line[k]) || line[k] == '_')
 			k++;
-		while(isspace(line[k]) && (line[k] != '\0' || line[k] != '\n'))
+		while(isspace(line[k]) && line[k] != '\0' && line[k] != '\n')
 			k++;
 		if(!isalnum(line[k]))
 			throw ErrorParsing("Incorrect config file");
