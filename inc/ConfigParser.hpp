@@ -6,7 +6,7 @@
 /*   By: nikitos <nikitos@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 20:11:42 by nikitos           #+#    #+#             */
-/*   Updated: 2024/03/04 19:44:10 by nikitos          ###   ########.fr       */
+/*   Updated: 2024/03/04 23:02:52 by nikitos          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ class ConfigParser
 				virtual ~ErrorParsing() throw() {}
 		};
 		private:
-			std::multimap <std::string, int> _data;
+			std::multimap <std::string, std::vector<std::string> > _data;
 };
 
 void  deleteCommentedLines(std::string &content);

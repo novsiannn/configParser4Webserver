@@ -6,7 +6,7 @@
 /*   By: nikitos <nikitos@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 20:12:20 by nikitos           #+#    #+#             */
-/*   Updated: 2024/03/04 21:32:16 by nikitos          ###   ########.fr       */
+/*   Updated: 2024/03/05 00:41:32 by nikitos          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,12 +45,6 @@ void ConfigParser::skipSpaces(std::string &content)
   content = content.substr(0, i + 1);
 }
 
-void	ConfigParser::takeData(std::string line, int i)
-{
-	// std::cout << line;
-	this->_data.insert(std::make_pair(line, i));
-}
-
 int	ConfigFile::checkCurlyBraces( std::string content )
 {
 	int opening_brace = 0;
@@ -69,6 +63,56 @@ int	ConfigFile::checkCurlyBraces( std::string content )
 		return 1;
 	else
 		return 0;
+}
+
+int checkStringEmpty(std::string line)
+{
+	int k = 0;
+
+	while (isspace(line[k]) && line[k] != '\0' && line[k] != '\n')
+		k++;
+	if (line[k] == '\0' || line[k] == '\n')
+		return 1;
+	else
+		return 0;
+}
+
+void	ConfigParser::takeData(std::string line, int i)
+{
+	// (void)line;
+	(void)i;
+	int k = 0;
+	int j = 0;
+	size_t found_semicolon = line.find(";");
+	size_t found_curly_brace = line.find("{");
+	size_t found_hash = line.find("#");
+	
+	if (found_hash != std::string::npos)
+	{
+		size_t end_line = line.find('\n', found_hash);
+		line.erase(found_hash, end_line - found_hash + 1);
+		if (checkStringEmpty(line))
+			return ;
+	}
+	// std::cout << "["<< line << "]" << std::endl;
+	if (found_semicolon != std::string::npos && found_curly_brace == std::string::npos)
+	{
+		while (isalnum(line[k]) || line[k] == '_')
+			k++;
+		while(isspace(line[k]) && (line[k] != '\0' || line[k] != '\n'))
+			k++;
+		if(!isalnum(line[k]))
+			throw ErrorParsing("Incorrect config file");
+		j = k;
+		while (line[k] != ';' && line[k] != '\n' && line[k] != '\0')
+			k++;
+		std::cout << line.substr(j,k) << std::endl;
+		// std::cout << line.substr(0,k) << std::endl;
+		
+		// _data.insert(make_pair(line.substr(0,k), 1));
+	}
+	// std::cout << line;
+	// this->_data.insert(std::make_pair(line, i));
 }
 
 std::string ConfigParser::readConfig( std::string path )
@@ -90,26 +134,31 @@ std::string ConfigParser::readConfig( std::string path )
 	if (!fileToCheck.checkCurlyBraces( content ))
 		throw ErrorParsing("Curly Braces are not closed");
 
-	// if (file_toTakeData.is_open()) 
-	// {
-	// 	int i = 0;
-    // 	while (getline(file_toTakeData, line, ';'))
-    //     {
-	// 		i++;
-	// 		this->takeData(line, i);
-	// 		// if (i > 3 )
-	// 		// 	break;
-	// 	}
-	// 	std::multimap <std::string, int>::iterator it;
-	// 	for(it = _data.begin(); it != _data.end(); it++)
-	// 	{
-	// 		std::cout << it->second <<" element in map -> " << it->first << std::endl;
-	// 	}
-    // }
+	if (file_toTakeData.is_open()) 
+	{
+		int i = 0;
+    	while (getline(file_toTakeData, line))
+        {
+			i++;
+			this->takeData(line, i);
+			// if( i > 3)
+			// 	break ;
+		}
+		std::multimap <std::string, std::vector<std::string> >::iterator it;
+		std::vector<std::string>::iterator it_vec;
+		for(it = _data.begin(); it != _data.end(); it++)
+		{
+			// std::cout << "Element in map key   ->     " << it->first << std::endl;
+			for (it_vec = it->second.begin(); it_vec != it->second.end(); it_vec++)
+			{
+				// std::cout << " Element in map value ->   " << *it_vec;  
+			}
+			// std::cout << '\n';
+		}
+    }
 	
-
+	// skipSpaces(content);
 	// file.takeData(file);
 
-    // skipSpaces(content);
     return path;
 }
