@@ -6,7 +6,7 @@
 /*   By: nikitos <nikitos@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 20:12:20 by nikitos           #+#    #+#             */
-/*   Updated: 2024/03/05 19:58:49 by nikitos          ###   ########.fr       */
+/*   Updated: 2024/03/05 20:33:19 by nikitos          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,24 +97,26 @@ int	ConfigParser::takeData(std::string line)
 	if (found_semicolon != std::string::npos && foundOpeningCurlyBrace == std::string::npos)
 	{
 		std::string key_for_line;
-		while(isspace(line[k]))
+		std::string val_for_line;
+
+		while (isspace(line[k]))
 			k++;
 		j = k;
 		while (isalnum(line[k]) || line[k] == '_')
 			k++;
 		key_for_line = line.substr(j,k);
-		while(isspace(line[k]))
+		while (isspace(line[k]))
 			k++;
-		if(!isalnum(line[k]))
+		if (!isalnum(line[k]))
 			throw ErrorParsing("Incorrect config file");
 		j = k;
 		while (line[k] != ';' && line[k] != '\n' && line[k] != '\0')
 			k++;
 
-		std::string val_for_line = line.substr(j,k);
-	
+		val_for_line = line.substr(j,k);
 		std::stringstream ss(val_for_line);
-		while(ss >> elem)
+
+		while (ss >> elem)
 			tmp.push_back(elem);
 		_data.insert(make_pair(key_for_line, tmp));
 	}
@@ -125,49 +127,50 @@ std::string	ConfigParser::cutKeyWordBeforeCurly(std::string line)
 {
 	int k = 0;
 	int j = 0;
-	while(isspace(line[j]))
+
+	while (isspace(line[j]))
 		j++;
 	while (line[k] != '\0' && line[k] != '\n' && line[k] != '{')
-			k++;
+		k++;
 	if (line[k] == '\n' || line[k] == '\0')
     	return line.substr(j);
 	else
     	return line.substr(j, k - j);
 }
 
-std::string ConfigParser::readConfig( std::string path )
+void	ConfigParser::readConfig( std::string path )
 {
 
-    ConfigFile		fileToCheck(path);
+    ConfigFile		file(path);
 	std::string		line;
 	std::string		content;
-	std::ifstream	file_toTakeData(path);
-	size_t foundOpeningCurlyBrace;
-	size_t foundClosedCurlyBrace;
+	std::ifstream	data_file(path);
+	size_t 			found_op_curly;
+	size_t			found_closed_curly;
 
-    if (fileToCheck.getTypePath(fileToCheck.getPath()) != 1)
+    if (file.getTypePath(file.getPath()) != 1)
 		  throw ErrorParsing("File is invalid");
-    if (fileToCheck.checkFile(fileToCheck.getPath(), 4) == -1)
+    if (file.checkFile(file.getPath(), 4) == -1)
 		  throw ErrorParsing("File is not accessible");
-	content = fileToCheck.readFile();
+	content = file.readFile();
     if(content.empty())
     	throw ErrorParsing("File is empty");
 	deleteCommentedLines(content);
-	if (!fileToCheck.checkCurlyBraces( content ))
+	if (!file.checkCurlyBraces( content ))
 		throw ErrorParsing("Curly Braces are not closed");
 
-	if (file_toTakeData.is_open()) 
+	if (data_file.is_open()) 
 	{
 		int scope = 0;
-    	while (getline(file_toTakeData, line))
+    	while (getline(data_file, line))
         {
-			foundOpeningCurlyBrace = line.find("{");
-			foundClosedCurlyBrace = line.find("}");
-			if ((foundOpeningCurlyBrace != std::string::npos && foundClosedCurlyBrace == std::string::npos ) || scope > 0)
+			found_op_curly = line.find("{");
+			found_closed_curly = line.find("}");
+			if ((found_op_curly != std::string::npos && found_closed_curly == std::string::npos ) || scope > 0)
 			{
 				if (scope == 0)
-					_keyForMainScope = cutKeyWordBeforeCurly(line);
-				if (foundOpeningCurlyBrace != std::string::npos)
+					_key_word_4_env = cutKeyWordBeforeCurly(line);
+				if (found_op_curly != std::string::npos)
 					scope++;
 				while(scope != 0)
 				{
@@ -176,7 +179,7 @@ std::string ConfigParser::readConfig( std::string path )
 					char		c;
 					int			commented = 0;
 
-            		while (file_toTakeData.get(c) && scope != 0) 
+            		while (data_file.get(c) && scope != 0) 
 					{
 						if (c == '{')
 							scope++;
@@ -193,7 +196,7 @@ std::string ConfigParser::readConfig( std::string path )
 					std::stringstream ss(remainingContent);
 					while(ss >> elem)
 						tmp.push_back(elem);
-					_data.insert(make_pair(_keyForMainScope, tmp));
+					_data.insert(make_pair(_key_word_4_env, tmp));
 					continue;
 				}
 			}
@@ -212,9 +215,4 @@ std::string ConfigParser::readConfig( std::string path )
 			std::cout << "NEXT PAIR" << std::endl;
 		}
     }
-	
-	// skipSpaces(content);
-	// file.takeData(file);
-
-    return path;
 }

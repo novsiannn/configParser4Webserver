@@ -6,7 +6,7 @@
 /*   By: nikitos <nikitos@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 20:11:42 by nikitos           #+#    #+#             */
-/*   Updated: 2024/03/05 11:41:48 by nikitos          ###   ########.fr       */
+/*   Updated: 2024/03/05 20:31:06 by nikitos          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ class ConfigParser
 	public:
 		ConfigParser();
 		~ConfigParser();
-		std::string readConfig( std::string path );
+		void		readConfig( std::string path );
 		void		skipSpaces(std::string &content);
 		int			takeData(std::string line);
 		std::string	cutKeyWordBeforeCurly(std::string line);
@@ -41,7 +41,7 @@ class ConfigParser
 				virtual ~ErrorParsing() throw() {}
 		};
 		private:
-			std::string	_keyForMainScope;
+			std::string	_key_word_4_env;
 			std::multimap <std::string, std::vector<std::string> > _data;
 };
 
