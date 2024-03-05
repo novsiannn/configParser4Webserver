@@ -6,7 +6,7 @@
 /*   By: nikitos <nikitos@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 20:12:20 by nikitos           #+#    #+#             */
-/*   Updated: 2024/03/05 12:31:18 by nikitos          ###   ########.fr       */
+/*   Updated: 2024/03/05 19:58:49 by nikitos          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,7 +163,6 @@ std::string ConfigParser::readConfig( std::string path )
         {
 			foundOpeningCurlyBrace = line.find("{");
 			foundClosedCurlyBrace = line.find("}");
-			// int k = 0;
 			if ((foundOpeningCurlyBrace != std::string::npos && foundClosedCurlyBrace == std::string::npos ) || scope > 0)
 			{
 				if (scope == 0)
@@ -174,14 +173,21 @@ std::string ConfigParser::readConfig( std::string path )
 				{
 					std::string remainingContent;
 					std::string elem;
-					char c;
+					char		c;
+					int			commented = 0;
+
             		while (file_toTakeData.get(c) && scope != 0) 
 					{
 						if (c == '{')
 							scope++;
 						else if(c == '}')
 							scope--;
-                		remainingContent += c;
+						if(c == '#')
+							commented = 1;
+						if (c == '\0' || c == '\n')
+							commented = 0;
+						if (commented == 0)
+                			remainingContent += c;
             		}
 					std::vector<std::string> tmp;
 					std::stringstream ss(remainingContent);
