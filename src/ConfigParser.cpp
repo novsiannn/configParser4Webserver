@@ -6,7 +6,7 @@
 /*   By: nikitos <nikitos@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/01 20:12:20 by nikitos           #+#    #+#             */
-/*   Updated: 2024/03/05 00:47:53 by nikitos          ###   ########.fr       */
+/*   Updated: 2024/03/05 12:31:18 by nikitos          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,42 +77,62 @@ int checkStringEmpty(std::string line)
 		return 0;
 }
 
-void	ConfigParser::takeData(std::string line, int i)
+int	ConfigParser::takeData(std::string line)
 {
-	// (void)line;
-	(void)i;
 	int k = 0;
 	int j = 0;
 	size_t found_semicolon = line.find(";");
-	size_t found_curly_brace = line.find("{");
+	size_t foundOpeningCurlyBrace = line.find("{");
 	size_t found_hash = line.find("#");
-	
+	std::vector<std::string> tmp;
+	std::string elem;
+
 	if (found_hash != std::string::npos)
 	{
 		size_t end_line = line.find('\n', found_hash);
 		line.erase(found_hash, end_line - found_hash + 1);
 		if (checkStringEmpty(line))
-			return ;
+			return 0;
 	}
-	// std::cout << "["<< line << "]" << std::endl;
-	if (found_semicolon != std::string::npos && found_curly_brace == std::string::npos)
+	if (found_semicolon != std::string::npos && foundOpeningCurlyBrace == std::string::npos)
 	{
+		std::string key_for_line;
+		while(isspace(line[k]))
+			k++;
+		j = k;
 		while (isalnum(line[k]) || line[k] == '_')
 			k++;
-		while(isspace(line[k]) && line[k] != '\0' && line[k] != '\n')
+		key_for_line = line.substr(j,k);
+		while(isspace(line[k]))
 			k++;
 		if(!isalnum(line[k]))
 			throw ErrorParsing("Incorrect config file");
 		j = k;
 		while (line[k] != ';' && line[k] != '\n' && line[k] != '\0')
 			k++;
-		std::cout << line.substr(j,k) << std::endl;
-		// std::cout << line.substr(0,k) << std::endl;
-		
-		// _data.insert(make_pair(line.substr(0,k), 1));
+
+		std::string val_for_line = line.substr(j,k);
+	
+		std::stringstream ss(val_for_line);
+		while(ss >> elem)
+			tmp.push_back(elem);
+		_data.insert(make_pair(key_for_line, tmp));
 	}
-	// std::cout << line;
-	// this->_data.insert(std::make_pair(line, i));
+	return 0;
+}
+
+std::string	ConfigParser::cutKeyWordBeforeCurly(std::string line)
+{
+	int k = 0;
+	int j = 0;
+	while(isspace(line[j]))
+		j++;
+	while (line[k] != '\0' && line[k] != '\n' && line[k] != '{')
+			k++;
+	if (line[k] == '\n' || line[k] == '\0')
+    	return line.substr(j);
+	else
+    	return line.substr(j, k - j);
 }
 
 std::string ConfigParser::readConfig( std::string path )
@@ -122,6 +142,8 @@ std::string ConfigParser::readConfig( std::string path )
 	std::string		line;
 	std::string		content;
 	std::ifstream	file_toTakeData(path);
+	size_t foundOpeningCurlyBrace;
+	size_t foundClosedCurlyBrace;
 
     if (fileToCheck.getTypePath(fileToCheck.getPath()) != 1)
 		  throw ErrorParsing("File is invalid");
@@ -136,24 +158,52 @@ std::string ConfigParser::readConfig( std::string path )
 
 	if (file_toTakeData.is_open()) 
 	{
-		int i = 0;
+		int scope = 0;
     	while (getline(file_toTakeData, line))
         {
-			i++;
-			this->takeData(line, i);
-			// if( i > 3)
-			// 	break ;
+			foundOpeningCurlyBrace = line.find("{");
+			foundClosedCurlyBrace = line.find("}");
+			// int k = 0;
+			if ((foundOpeningCurlyBrace != std::string::npos && foundClosedCurlyBrace == std::string::npos ) || scope > 0)
+			{
+				if (scope == 0)
+					_keyForMainScope = cutKeyWordBeforeCurly(line);
+				if (foundOpeningCurlyBrace != std::string::npos)
+					scope++;
+				while(scope != 0)
+				{
+					std::string remainingContent;
+					std::string elem;
+					char c;
+            		while (file_toTakeData.get(c) && scope != 0) 
+					{
+						if (c == '{')
+							scope++;
+						else if(c == '}')
+							scope--;
+                		remainingContent += c;
+            		}
+					std::vector<std::string> tmp;
+					std::stringstream ss(remainingContent);
+					while(ss >> elem)
+						tmp.push_back(elem);
+					_data.insert(make_pair(_keyForMainScope, tmp));
+					continue;
+				}
+			}
+			this->takeData(line);
 		}
+		
 		std::multimap <std::string, std::vector<std::string> >::iterator it;
 		std::vector<std::string>::iterator it_vec;
 		for(it = _data.begin(); it != _data.end(); it++)
 		{
-			// std::cout << "Element in map key   ->     " << it->first << std::endl;
+			std::cout << "Element in map key   -> " << it->first << std::endl;
 			for (it_vec = it->second.begin(); it_vec != it->second.end(); it_vec++)
 			{
-				// std::cout << " Element in map value ->   " << *it_vec;  
+				std::cout << "Element in map value -> " << *it_vec << std::endl;  
 			}
-			// std::cout << '\n';
+			std::cout << "NEXT PAIR" << std::endl;
 		}
     }
 	
